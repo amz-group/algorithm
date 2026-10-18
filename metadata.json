@@ -1,0 +1,7 @@
+{
+  "name": "KRD ALGORITHM",
+  "description": "Interactive educational algorithm analyzer, step-by-step visualizer, and multi-language code reference for 10 foundational computer science algorithms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
