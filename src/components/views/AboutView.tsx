@@ -96,7 +96,7 @@ export const AboutView: React.FC = () => {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F2F2ED] dark:bg-[#262626] hover:bg-[#EBEBE6] dark:hover:bg-[#303030] text-[#171717] dark:text-[#FAFAFA] font-semibold text-xs border border-[#E0E0DB] dark:border-[#333333] transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-[#D4A72C]" />
-              <span>contact@krdgroup.dev</span>
+              <span>info@krdgroup.dev</span>
             </a>
           </div>
         </div>
@@ -111,8 +111,12 @@ export const AboutView: React.FC = () => {
       <div className="p-6 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-[#E5E5DF] dark:border-[#282828] shadow-xs">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#F0F0EB] dark:border-[#262626]">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#E0A820] via-[#F5C542] to-[#FFE685] text-[#111111] flex items-center justify-center font-extrabold text-lg font-mono shadow-xs">
-              MB
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden ring-2 ring-[#D4A72C]/50 border border-[#D4A72C]/30 shadow-md shrink-0 bg-[#141414]">
+              <img
+                src="/assets/aistudio/IMG_7272__2__f904812e.PNG"
+                alt="Mohammed Barzan Ali"
+                className="w-full h-full object-cover object-top"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
