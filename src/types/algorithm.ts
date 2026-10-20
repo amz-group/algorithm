@@ -6,11 +6,9 @@ export type AlgorithmId =
   | 'quick-sort'
   | 'heap-sort'
   | 'linear-search'
-  | 'binary-search'
-  | 'bfs'
-  | 'dijkstra';
+  | 'binary-search';
 
-export type AlgorithmCategory = 'sorting' | 'searching' | 'graph';
+export type AlgorithmCategory = 'sorting' | 'searching';
 
 export type LanguageId = 'java' | 'cpp' | 'python' | 'csharp' | 'javascript';
 
@@ -45,7 +43,7 @@ export interface AlgorithmMetadata {
 export interface SortingStep {
   stepIndex: number;
   arrayState: DataElement[];
-  highlightIndices: number[]; // e.g., elements currently compared or visited
+  highlightIndices: number[]; // elements currently compared or visited
   swapIndices?: [number, number]; // elements being swapped
   sortedIndices: number[]; // elements confirmed in their final sorted position
   pivotIndex?: number; // for quick sort
@@ -76,37 +74,7 @@ export interface SearchingStep {
   afterState: string;
 }
 
-export interface GraphNode {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-}
-
-export interface GraphEdge {
-  from: string;
-  to: string;
-  weight?: number;
-}
-
-export interface GraphStep {
-  stepIndex: number;
-  activeNode: string;
-  visitedNodes: string[];
-  queueState?: string[]; // For BFS
-  distances?: { [nodeId: string]: number }; // For Dijkstra
-  predecessors?: { [nodeId: string]: string | null }; // For Dijkstra
-  activeEdge?: { from: string; to: string };
-  shortestPath?: string[];
-  operation: string;
-  description: string;
-  decision: string;
-  valuesExamined: string;
-  beforeState: string;
-  afterState: string;
-}
-
-export type ExecutionStep = SortingStep | SearchingStep | GraphStep;
+export type ExecutionStep = SortingStep | SearchingStep;
 
 export interface ExecutionResult {
   algorithmId: AlgorithmId;
@@ -123,12 +91,5 @@ export interface ExecutionResult {
   targetValue?: DataElement;
   found?: boolean;
   foundIndex?: number;
-  // Graph specific
-  startNode?: string;
-  targetNode?: string;
-  traversalOrder?: string[];
-  shortestPath?: string[];
-  shortestDistance?: number;
-  visitedCount?: number;
   steps: ExecutionStep[];
 }

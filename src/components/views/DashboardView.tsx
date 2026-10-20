@@ -63,9 +63,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     'quick-sort',
     'heap-sort',
     'linear-search',
-    'binary-search',
-    'bfs',
-    'dijkstra'
+    'binary-search'
   ];
 
   const filtered = selectedCategory === 'all'
@@ -100,7 +98,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 : 'text-[#666666] dark:text-[#888888] hover:text-[#111111] dark:hover:text-white'
             }`}
           >
-            All (10)
+            All (8)
           </button>
           <button
             onClick={() => setSelectedCategory('sorting')}
@@ -121,16 +119,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             }`}
           >
             Searching (2)
-          </button>
-          <button
-            onClick={() => setSelectedCategory('graph')}
-            className={`px-3 py-1 rounded-md transition-colors ${
-              selectedCategory === 'graph'
-                ? 'bg-white dark:bg-[#2A2A2A] text-[#111111] dark:text-[#FAFAFA] shadow-xs font-semibold'
-                : 'text-[#666666] dark:text-[#888888] hover:text-[#111111] dark:hover:text-white'
-            }`}
-          >
-            Graph (2)
           </button>
         </div>
       </div>

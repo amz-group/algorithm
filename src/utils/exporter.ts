@@ -40,14 +40,7 @@ export function downloadResultAsTxt(result: ExecutionResult) {
     content += `Target Index: ${result.foundIndex !== undefined && result.foundIndex >= 0 ? result.foundIndex : 'Not Found (-1)'}\n\n`;
   }
 
-  if (result.traversalOrder) {
-    content += `Graph Traversal Order: ${result.traversalOrder.join(' -> ')}\n`;
-  }
 
-  if (result.shortestPath) {
-    content += `Shortest Path: ${result.shortestPath.join(' -> ')}\n`;
-    content += `Total Distance / Weight: ${result.shortestDistance}\n`;
-  }
 
   content += `\n=======================================================\n`;
   content += `KRD ALGORITHM Platform - Computer Science Education\n`;
@@ -81,10 +74,7 @@ export function downloadResultAsCsv(result: ExecutionResult) {
     csv += `"Target Index",${result.foundIndex}\n`;
   }
 
-  if (result.shortestPath) {
-    csv += `"Shortest Path","${result.shortestPath.join(' -> ')}"\n`;
-    csv += `"Shortest Distance",${result.shortestDistance}\n`;
-  }
+
 
   triggerDownload(csv, `${result.algorithmId}-result.csv`, 'text/csv;charset=utf-8');
 }
@@ -147,10 +137,7 @@ export function downloadJsonResults(result: ExecutionResult) {
       output: result.outputArray,
       target: result.targetValue,
       found: result.found,
-      foundIndex: result.foundIndex,
-      shortestPath: result.shortestPath,
-      shortestDistance: result.shortestDistance,
-      traversalOrder: result.traversalOrder
+      foundIndex: result.foundIndex
     },
     steps: result.steps
   };

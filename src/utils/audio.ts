@@ -68,6 +68,14 @@ class SoundSynthesizer {
   playStep() {
     this.playTone(380, 0.03, 'sine', 0.04);
   }
+
+  playClick() {
+    this.playTone(400, 0.03, 'sine', 0.04);
+  }
+
+  playReset() {
+    this.playTone(320, 0.05, 'sine', 0.05);
+  }
 }
 
 export const soundEffects = new SoundSynthesizer();

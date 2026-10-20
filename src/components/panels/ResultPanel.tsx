@@ -33,7 +33,6 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ result, metadata }) =>
 
   const isSorting = metadata.category === 'sorting';
   const isSearching = metadata.category === 'searching';
-  const isGraph = metadata.category === 'graph';
 
   return (
     <div className="bg-white dark:bg-[#1E1E1E] rounded-xl border border-[#E5E5E0] dark:border-[#2E2E2E] p-4 transition-colors space-y-4">
@@ -92,35 +91,6 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({ result, metadata }) =>
         </div>
       )}
 
-      {isGraph && (
-        <div className="space-y-2 text-xs">
-          {result.shortestPath && result.shortestPath.length > 0 && (
-            <div className="p-3 rounded-lg bg-[#F7F7F4] dark:bg-[#141414] border border-[#D4A72C]/40 flex items-center justify-between">
-              <div>
-                <span className="text-[#737373] dark:text-[#A3A3A3] block text-[11px]">Shortest Path:</span>
-                <span className="font-mono font-bold text-sm text-[#111111] dark:text-[#F5C542]">
-                  {result.shortestPath.join(' → ')}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[#737373] dark:text-[#A3A3A3] block text-[11px]">Total Distance:</span>
-                <span className="font-mono font-bold text-sm text-[#D4A72C]">
-                  {result.shortestDistance}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {result.traversalOrder && (
-            <div>
-              <span className="text-[11px] text-[#737373] block mb-1">BFS Traversal Order:</span>
-              <p className="font-mono bg-[#F7F7F4] dark:bg-[#141414] p-2 rounded border border-[#E5E5E0] dark:border-[#282828] text-[#171717] dark:text-[#FAFAFA]">
-                {result.traversalOrder.join(' → ')}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Downloads (Clean & Simple Buttons) */}
       <div className="pt-2 border-t border-[#F0F0EC] dark:border-[#282828] flex flex-wrap items-center justify-between gap-2">

@@ -44,9 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     'quick-sort',
     'heap-sort',
     'linear-search',
-    'binary-search',
-    'bfs',
-    'dijkstra'
+    'binary-search'
   ];
 
   const handleItemClick = (view: ActiveView) => {
@@ -149,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="space-y-1">
           {!collapsed ? (
             <div className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-[#8A8A8A] uppercase flex items-center justify-between">
-              <span>Algorithms (10)</span>
+              <span>Algorithms (8)</span>
               <Layers className="w-3.5 h-3.5 text-[#F5C542]" />
             </div>
           ) : (
@@ -160,8 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             const def = ALGORITHM_DEFINITIONS[id];
             const getIcon = () => {
               if (def.category === 'sorting') return ArrowUpDown;
-              if (def.category === 'searching') return Search;
-              return Network;
+              return Search;
             };
             return renderNavButton(id, def.name, getIcon());
           })}
