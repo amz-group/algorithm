@@ -1,9 +1,10 @@
-import { AlgorithmId, ExecutionResult, SearchingStep } from '../types/algorithm';
+import { AlgorithmId, ExecutionResult, SearchingStep, DataElement } from '../types/algorithm';
+import { compareElements, formatElement, formatArray } from '../utils/comparator';
 
 export function runSearchingAlgorithm(
   algorithmId: AlgorithmId,
-  input: number[],
-  target: number
+  input: DataElement[],
+  target: DataElement
 ): ExecutionResult {
   const startTime = performance.now();
   const arr = [...input];
@@ -19,11 +20,11 @@ export function runSearchingAlgorithm(
     target,
     found: false,
     operation: 'Initialization',
-    description: `Target value is ${target}. Array has ${arr.length} elements.`,
+    description: `Target value is ${formatElement(target)}. Array has ${arr.length} elements.`,
     decision: 'Prepare search pointers.',
-    valuesExamined: `Target = ${target}`,
-    beforeState: `[${arr.join(', ')}]`,
-    afterState: `[${arr.join(', ')}]`
+    valuesExamined: `Target = ${formatElement(target)}`,
+    beforeState: formatArray(arr),
+    afterState: formatArray(arr)
   });
 
   if (algorithmId === 'linear-search') {
@@ -31,7 +32,7 @@ export function runSearchingAlgorithm(
     for (let i = 0; i < arr.length; i++) {
       comparisons++;
       const currentVal = arr[i];
-      const isMatch = currentVal === target;
+      const isMatch = compareElements(currentVal, target) === 0;
 
       if (isMatch) {
         found = true;
@@ -43,9 +44,9 @@ export function runSearchingAlgorithm(
           target,
           found: true,
           operation: `Match Found at Index ${i}`,
-          description: `Examining index ${i}. Value ${currentVal} matches target ${target}! Search succeeds.`,
+          description: `Examining index ${i}. Value ${formatElement(currentVal)} matches target ${formatElement(target)}! Search succeeds.`,
           decision: `Target found. Terminate search.`,
-          valuesExamined: `A[${i}]=${currentVal}, Target=${target}`,
+          valuesExamined: `A[${i}]=${formatElement(currentVal)}, Target=${formatElement(target)}`,
           beforeState: `Examining index ${i}`,
           afterState: `Match confirmed at index ${i}`
         });
@@ -58,9 +59,9 @@ export function runSearchingAlgorithm(
           target,
           found: false,
           operation: `Inspect Index ${i}`,
-          description: `Examining index ${i}. Value ${currentVal} does not match target ${target}. Advancing to index ${i + 1}.`,
+          description: `Examining index ${i}. Value ${formatElement(currentVal)} does not match target ${formatElement(target)}. Advancing to index ${i + 1}.`,
           decision: `No match. Continue scan.`,
-          valuesExamined: `A[${i}]=${currentVal}, Target=${target}`,
+          valuesExamined: `A[${i}]=${formatElement(currentVal)}, Target=${formatElement(target)}`,
           beforeState: `Inspecting index ${i}`,
           afterState: `Index ${i} rejected`
         });
@@ -75,7 +76,7 @@ export function runSearchingAlgorithm(
         target,
         found: false,
         operation: 'Target Not Found',
-        description: `Exhausted all ${arr.length} elements without finding target ${target}. Search terminates with -1.`,
+        description: `Exhausted all ${arr.length} elements without finding target ${formatElement(target)}. Search terminates with -1.`,
         decision: 'Target does not exist in array.',
         valuesExamined: 'All array elements',
         beforeState: 'Array fully inspected',
@@ -91,8 +92,9 @@ export function runSearchingAlgorithm(
       comparisons++;
       const mid = low + Math.floor((high - low) / 2);
       const midVal = arr[mid];
+      const cmp = compareElements(midVal, target);
 
-      if (midVal === target) {
+      if (cmp === 0) {
         found = true;
         foundIndex = mid;
         steps.push({
@@ -105,14 +107,14 @@ export function runSearchingAlgorithm(
           target,
           found: true,
           operation: `Target Found at Mid (Index ${mid})`,
-          description: `Calculated midpoint index ${mid} = ${low} + ⌊(${high} - ${low}) / 2⌋. A[${mid}] (${midVal}) matches target ${target}!`,
+          description: `Calculated midpoint index ${mid} = ${low} + ⌊(${high} - ${low}) / 2⌋. A[${mid}] (${formatElement(midVal)}) matches target ${formatElement(target)}!`,
           decision: `Target located at index ${mid}. Terminate.`,
-          valuesExamined: `A[${mid}]=${midVal}, Target=${target}`,
+          valuesExamined: `A[${mid}]=${formatElement(midVal)}, Target=${formatElement(target)}`,
           beforeState: `Active search window [${low}..${high}]`,
           afterState: `Match confirmed at index ${mid}`
         });
         break;
-      } else if (midVal < target) {
+      } else if (cmp < 0) {
         steps.push({
           stepIndex: stepCount++,
           arrayState: [...arr],
@@ -123,9 +125,9 @@ export function runSearchingAlgorithm(
           target,
           found: false,
           operation: `Bisect: Target in Right Half`,
-          description: `A[${mid}] (${midVal}) < Target (${target}). Target must lie to the right of index ${mid}. Discarding left range [${low}..${mid}].`,
+          description: `A[${mid}] (${formatElement(midVal)}) < Target (${formatElement(target)}). Target must lie to the right of index ${mid}. Discarding left range [${low}..${mid}].`,
           decision: `Set Low = ${mid + 1}.`,
-          valuesExamined: `A[${mid}]=${midVal}, Target=${target}`,
+          valuesExamined: `A[${mid}]=${formatElement(midVal)}, Target=${formatElement(target)}`,
           beforeState: `Active search window [${low}..${high}]`,
           afterState: `New window [${mid + 1}..${high}]`
         });
@@ -141,9 +143,9 @@ export function runSearchingAlgorithm(
           target,
           found: false,
           operation: `Bisect: Target in Left Half`,
-          description: `A[${mid}] (${midVal}) > Target (${target}). Target must lie to the left of index ${mid}. Discarding right range [${mid}..${high}].`,
+          description: `A[${mid}] (${formatElement(midVal)}) > Target (${formatElement(target)}). Target must lie to the left of index ${mid}. Discarding right range [${mid}..${high}].`,
           decision: `Set High = ${mid - 1}.`,
-          valuesExamined: `A[${mid}]=${midVal}, Target=${target}`,
+          valuesExamined: `A[${mid}]=${formatElement(midVal)}, Target=${formatElement(target)}`,
           beforeState: `Active search window [${low}..${high}]`,
           afterState: `New window [${low}..${mid - 1}]`
         });
@@ -161,7 +163,7 @@ export function runSearchingAlgorithm(
         target,
         found: false,
         operation: 'Target Not Found',
-        description: `Search window collapsed (Low ${low} > High ${high}). Target ${target} is not in the array. Returning -1.`,
+        description: `Search window collapsed (Low ${low} > High ${high}). Target ${formatElement(target)} is not in the array. Returning -1.`,
         decision: 'Target does not exist in sorted array.',
         valuesExamined: 'Search interval empty',
         beforeState: `Low ${low} > High ${high}`,

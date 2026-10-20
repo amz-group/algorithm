@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AlgorithmId, ExecutionResult } from '../../types/algorithm';
+import { AlgorithmId, ExecutionResult, DataElement } from '../../types/algorithm';
 import { ALGORITHM_DEFINITIONS } from '../../data/algorithmDefinitions';
 import { GRAPH_PRESETS } from '../../data/graphPresets';
 import { runSortingAlgorithm } from '../../engine/sortingEngine';
@@ -31,8 +31,8 @@ export const AlgorithmWorkspace: React.FC<AlgorithmWorkspaceProps> = ({
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('result');
 
   // Input States
-  const [currentInput, setCurrentInput] = useState<number[]>(metadata.defaultInput);
-  const [targetValue, setTargetValue] = useState<number>(
+  const [currentInput, setCurrentInput] = useState<DataElement[]>(metadata.defaultInput);
+  const [targetValue, setTargetValue] = useState<DataElement>(
     algorithmId === 'binary-search' ? 23 : 70
   );
 
@@ -50,7 +50,7 @@ export const AlgorithmWorkspace: React.FC<AlgorithmWorkspaceProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Execute algorithm when algorithmId or input changes
-  const executeCurrentAlgorithm = (newArr?: number[]) => {
+  const executeCurrentAlgorithm = (newArr?: DataElement[]) => {
     const inputArr = newArr || currentInput;
     try {
       let res: ExecutionResult;
@@ -183,7 +183,7 @@ export const AlgorithmWorkspace: React.FC<AlgorithmWorkspaceProps> = ({
     soundEffects.playStep();
   };
 
-  const handleInputAnalyze = (newArr: number[]) => {
+  const handleInputAnalyze = (newArr: DataElement[]) => {
     if (metadata.category !== 'graph') {
       setCurrentInput(newArr);
       executeCurrentAlgorithm(newArr);

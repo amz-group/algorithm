@@ -14,6 +14,8 @@ export type AlgorithmCategory = 'sorting' | 'searching' | 'graph';
 
 export type LanguageId = 'java' | 'cpp' | 'python' | 'csharp' | 'javascript';
 
+export type DataElement = number | string;
+
 export interface ComplexityInfo {
   bestTime: string;
   averageTime: string;
@@ -36,13 +38,13 @@ export interface AlgorithmMetadata {
   disadvantages: string[];
   bestUseCases: string[];
   complexity: ComplexityInfo;
-  defaultInput: number[];
+  defaultInput: DataElement[];
   sampleExample: string;
 }
 
 export interface SortingStep {
   stepIndex: number;
-  arrayState: number[];
+  arrayState: DataElement[];
   highlightIndices: number[]; // e.g., elements currently compared or visited
   swapIndices?: [number, number]; // elements being swapped
   sortedIndices: number[]; // elements confirmed in their final sorted position
@@ -59,12 +61,12 @@ export interface SortingStep {
 
 export interface SearchingStep {
   stepIndex: number;
-  arrayState: number[];
+  arrayState: DataElement[];
   currentIndex: number;
   lowIndex?: number;
   highIndex?: number;
   midIndex?: number;
-  target: number;
+  target: DataElement;
   found: boolean;
   operation: string;
   description: string;
@@ -114,11 +116,11 @@ export interface ExecutionResult {
   comparisonsCount: number;
   swapsCount: number;
   // Sorting specific
-  inputArray?: number[];
-  outputArray?: number[];
+  inputArray?: DataElement[];
+  outputArray?: DataElement[];
   isSorted?: boolean;
   // Searching specific
-  targetValue?: number;
+  targetValue?: DataElement;
   found?: boolean;
   foundIndex?: number;
   // Graph specific

@@ -8,6 +8,7 @@ import {
   GraphEdge
 } from '../../types/algorithm';
 import { Network, Check, ArrowRight, CornerDownRight } from 'lucide-react';
+import { calculateNormalizedHeight, compareElements } from '../../utils/comparator';
 
 interface VisualizationPanelProps {
   metadata: AlgorithmMetadata;
@@ -100,10 +101,6 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
             <div className="flex-1 min-h-[220px] flex items-end justify-center gap-1.5 sm:gap-2 px-2 py-4">
               {(() => {
                 const arr = currentStepData.arrayState;
-                const maxVal = Math.max(...arr, 1);
-                const minVal = Math.min(...arr, 0);
-                const range = maxVal - minVal || 1;
-
                 const step = currentStepData as SortingStep;
                 const highlights: number[] = step.highlightIndices || [];
                 const swaps: number[] = step.swapIndices ? [...step.swapIndices] : [];
@@ -111,7 +108,7 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
                 const pivot = step.pivotIndex;
 
                 return arr.map((value, idx) => {
-                  const normalizedHeight = Math.max(15, Math.round(((value - minVal) / range) * 160) + 20);
+                  const normalizedHeight = calculateNormalizedHeight(value, arr);
                   const isHighlight = highlights.includes(idx);
                   const isSwap = swaps.includes(idx);
                   const isSorted = sorted.includes(idx);
@@ -140,7 +137,10 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
                       className="flex-1 max-w-16 flex flex-col items-center justify-end h-full group"
                     >
                       {/* Top Value Label */}
-                      <span className={`text-[11px] font-mono mb-1.5 transition-colors ${textColor}`}>
+                      <span
+                        className={`text-[11px] font-mono mb-1.5 transition-colors truncate max-w-full px-0.5 text-center ${textColor}`}
+                        title={String(value)}
+                      >
                         {value}
                       </span>
 
@@ -219,7 +219,7 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
                   {/* Array Cells */}
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     {arr.map((val, idx) => {
-                      const isTargetMatch = step.found && (curr === idx || mid === idx);
+                      const isTargetMatch = step.found && compareElements(val, target) === 0 && (curr === idx || mid === idx);
                       const isCurrentInspect = curr === idx || mid === idx;
                       const isInSearchWindow =
                         low !== undefined && high !== undefined
@@ -250,7 +250,8 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
 
                           {/* Cell Box */}
                           <div
-                            className={`w-11 h-11 sm:w-13 sm:h-13 rounded-lg border flex items-center justify-center font-mono text-sm sm:text-base transition-all duration-200 shadow-xs ${cellBg}`}
+                            title={String(val)}
+                            className={`min-w-11 px-2.5 h-11 sm:min-w-13 sm:h-13 max-w-32 rounded-lg border flex items-center justify-center font-mono text-xs sm:text-sm transition-all duration-200 shadow-xs truncate ${cellBg}`}
                           >
                             {val}
                           </div>

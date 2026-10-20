@@ -1,6 +1,7 @@
-import { AlgorithmId, ExecutionResult, SortingStep } from '../types/algorithm';
+import { AlgorithmId, ExecutionResult, SortingStep, DataElement } from '../types/algorithm';
+import { compareElements, formatElement, formatArray } from '../utils/comparator';
 
-export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): ExecutionResult {
+export function runSortingAlgorithm(algorithmId: AlgorithmId, input: DataElement[]): ExecutionResult {
   const startTime = performance.now();
   const arr = [...input];
   const steps: SortingStep[] = [];
@@ -17,8 +18,8 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
     description: `Loaded initial array of ${arr.length} elements for sorting.`,
     decision: 'Algorithm prepared to begin execution.',
     valuesExamined: 'Entire input dataset',
-    beforeState: `[${arr.join(', ')}]`,
-    afterState: `[${arr.join(', ')}]`
+    beforeState: formatArray(arr),
+    afterState: formatArray(arr)
   });
 
   if (arr.length <= 1) {
@@ -49,15 +50,16 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           comparisons++;
           const valA = arr[j];
           const valB = arr[j + 1];
-          const before = `[${arr.join(', ')}]`;
+          const before = formatArray(arr);
+          const cmp = compareElements(valA, valB);
 
-          if (valA > valB) {
+          if (cmp > 0) {
             swaps++;
             swappedThisPass = true;
             // Swap
             arr[j] = valB;
             arr[j + 1] = valA;
-            const after = `[${arr.join(', ')}]`;
+            const after = formatArray(arr);
 
             steps.push({
               stepIndex: stepCount++,
@@ -66,9 +68,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               swapIndices: [j, j + 1],
               sortedIndices: [...sortedIndices],
               operation: `Compare & Swap (Pass ${i + 1})`,
-              description: `Comparing A[${j}] (${valA}) and A[${j + 1}] (${valB}). Because ${valA} > ${valB}, they are swapped.`,
-              decision: `Order violation detected: swap ${valA} and ${valB}.`,
-              valuesExamined: `A[${j}]=${valA}, A[${j + 1}]=${valB}`,
+              description: `Comparing A[${j}] (${formatElement(valA)}) and A[${j + 1}] (${formatElement(valB)}). Because ${formatElement(valA)} > ${formatElement(valB)}, they are swapped.`,
+              decision: `Order violation detected: swap ${formatElement(valA)} and ${formatElement(valB)}.`,
+              valuesExamined: `A[${j}]=${formatElement(valA)}, A[${j + 1}]=${formatElement(valB)}`,
               beforeState: before,
               afterState: after
             });
@@ -79,9 +81,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               highlightIndices: [j, j + 1],
               sortedIndices: [...sortedIndices],
               operation: `Compare (Pass ${i + 1})`,
-              description: `Comparing A[${j}] (${valA}) and A[${j + 1}] (${valB}). Because ${valA} ≤ ${valB}, no swap is needed.`,
+              description: `Comparing A[${j}] (${formatElement(valA)}) and A[${j + 1}] (${formatElement(valB)}). Because ${formatElement(valA)} ≤ ${formatElement(valB)}, no swap is needed.`,
               decision: `Correct relative order: preserve positions.`,
-              valuesExamined: `A[${j}]=${valA}, A[${j + 1}]=${valB}`,
+              valuesExamined: `A[${j}]=${formatElement(valA)}, A[${j + 1}]=${formatElement(valB)}`,
               beforeState: before,
               afterState: before
             });
@@ -95,11 +97,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: [n - 1 - i],
           sortedIndices: [...sortedIndices],
           operation: `Pass ${i + 1} Complete`,
-          description: `Element at index ${n - 1 - i} (${arr[n - 1 - i]}) is now locked into its final sorted position.`,
+          description: `Element at index ${n - 1 - i} (${formatElement(arr[n - 1 - i])}) is now locked into its final sorted position.`,
           decision: `Locked index ${n - 1 - i}.`,
-          valuesExamined: `A[${n - 1 - i}]=${arr[n - 1 - i]}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          valuesExamined: `A[${n - 1 - i}]=${formatElement(arr[n - 1 - i])}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         if (!swappedThisPass) {
@@ -112,8 +114,8 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             description: `No swaps occurred during pass ${i + 1}. The array is confirmed sorted.`,
             decision: 'Early exit triggered.',
             valuesExamined: 'All remaining elements',
-            beforeState: `[${arr.join(', ')}]`,
-            afterState: `[${arr.join(', ')}]`
+            beforeState: formatArray(arr),
+            afterState: formatArray(arr)
           });
           break;
         }
@@ -134,16 +136,16 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: [i],
           sortedIndices: [...sortedIndices],
           operation: `Start Pass ${i + 1}`,
-          description: `Assume candidate minimum is at index ${i} with value ${arr[i]}. Scanning unsorted remainder [${i + 1}..${n - 1}].`,
+          description: `Assume candidate minimum is at index ${i} with value ${formatElement(arr[i])}. Scanning unsorted remainder [${i + 1}..${n - 1}].`,
           decision: `Initial min candidate set to index ${i}.`,
-          valuesExamined: `A[${i}]=${arr[i]}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          valuesExamined: `A[${i}]=${formatElement(arr[i])}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         for (let j = i + 1; j < n; j++) {
           comparisons++;
-          const isNewMin = arr[j] < arr[minIdx];
+          const isNewMin = compareElements(arr[j], arr[minIdx]) < 0;
           const prevMinIdx = minIdx;
           if (isNewMin) {
             minIdx = j;
@@ -155,11 +157,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             highlightIndices: [minIdx, j],
             sortedIndices: [...sortedIndices],
             operation: `Scan for Minimum`,
-            description: `Comparing candidate min A[${prevMinIdx}] (${arr[prevMinIdx]}) with A[${j}] (${arr[j]}).${isNewMin ? ` Found smaller element! Updated minimum index to ${j}.` : ` Retaining current minimum at index ${prevMinIdx}.`}`,
-            decision: isNewMin ? `New minimum found at index ${j} (${arr[j]}).` : `Keep current minimum at index ${prevMinIdx}.`,
-            valuesExamined: `A[${prevMinIdx}]=${arr[prevMinIdx]}, A[${j}]=${arr[j]}`,
-            beforeState: `[${arr.join(', ')}]`,
-            afterState: `[${arr.join(', ')}]`
+            description: `Comparing candidate min A[${prevMinIdx}] (${formatElement(arr[prevMinIdx])}) with A[${j}] (${formatElement(arr[j])}).${isNewMin ? ` Found smaller element! Updated minimum index to ${j}.` : ` Retaining current minimum at index ${prevMinIdx}.`}`,
+            decision: isNewMin ? `New minimum found at index ${j} (${formatElement(arr[j])}).` : `Keep current minimum at index ${prevMinIdx}.`,
+            valuesExamined: `A[${prevMinIdx}]=${formatElement(arr[prevMinIdx])}, A[${j}]=${formatElement(arr[j])}`,
+            beforeState: formatArray(arr),
+            afterState: formatArray(arr)
           });
         }
 
@@ -167,10 +169,10 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           swaps++;
           const valI = arr[i];
           const valMin = arr[minIdx];
-          const before = `[${arr.join(', ')}]`;
+          const before = formatArray(arr);
           arr[i] = valMin;
           arr[minIdx] = valI;
-          const after = `[${arr.join(', ')}]`;
+          const after = formatArray(arr);
 
           steps.push({
             stepIndex: stepCount++,
@@ -179,9 +181,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             swapIndices: [i, minIdx],
             sortedIndices: [...sortedIndices, i],
             operation: `Swap Minimum into Position ${i}`,
-            description: `Swapped minimum element ${valMin} (from index ${minIdx}) with element ${valI} at index ${i}.`,
+            description: `Swapped minimum element ${formatElement(valMin)} (from index ${minIdx}) with element ${formatElement(valI)} at index ${i}.`,
             decision: `Position ${i} now holds the ${i + 1}-th smallest element.`,
-            valuesExamined: `A[${i}]=${valI}, A[${minIdx}]=${valMin}`,
+            valuesExamined: `A[${i}]=${formatElement(valI)}, A[${minIdx}]=${formatElement(valMin)}`,
             beforeState: before,
             afterState: after
           });
@@ -192,11 +194,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             highlightIndices: [i],
             sortedIndices: [...sortedIndices, i],
             operation: `No Swap Needed`,
-            description: `Element ${arr[i]} at index ${i} is already the minimum of the remaining subarray.`,
+            description: `Element ${formatElement(arr[i])} at index ${i} is already the minimum of the remaining subarray.`,
             decision: `Position ${i} remains unchanged.`,
-            valuesExamined: `A[${i}]=${arr[i]}`,
-            beforeState: `[${arr.join(', ')}]`,
-            afterState: `[${arr.join(', ')}]`
+            valuesExamined: `A[${i}]=${formatElement(arr[i])}`,
+            beforeState: formatArray(arr),
+            afterState: formatArray(arr)
           });
         }
         sortedIndices.push(i);
@@ -219,20 +221,20 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: [i],
           sortedIndices: [...sortedIndices],
           operation: `Select Key (Index ${i})`,
-          description: `Selected key = ${key} at index ${i}. Comparing backward through sorted prefix [0..${i - 1}].`,
-          decision: `Begin shifting elements greater than ${key}.`,
-          valuesExamined: `Key = ${key}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          description: `Selected key = ${formatElement(key)} at index ${i}. Comparing backward through sorted prefix [0..${i - 1}].`,
+          decision: `Begin shifting elements greater than ${formatElement(key)}.`,
+          valuesExamined: `Key = ${formatElement(key)}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         while (j >= 0) {
           comparisons++;
-          if (arr[j] > key) {
+          if (compareElements(arr[j], key) > 0) {
             swaps++; // shift count
-            const before = `[${arr.join(', ')}]`;
+            const before = formatArray(arr);
             arr[j + 1] = arr[j];
-            const after = `[${arr.join(', ')}]`;
+            const after = formatArray(arr);
 
             steps.push({
               stepIndex: stepCount++,
@@ -240,9 +242,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               highlightIndices: [j, j + 1],
               sortedIndices: [...sortedIndices],
               operation: `Shift Element Right`,
-              description: `A[${j}] (${arr[j + 1]}) > Key (${key}). Shifting A[${j}] to position ${j + 1}.`,
+              description: `A[${j}] (${formatElement(arr[j + 1])}) > Key (${formatElement(key)}). Shifting A[${j}] to position ${j + 1}.`,
               decision: `Make room for key by shifting right.`,
-              valuesExamined: `A[${j}]=${arr[j + 1]}, Key=${key}`,
+              valuesExamined: `A[${j}]=${formatElement(arr[j + 1])}, Key=${formatElement(key)}`,
               beforeState: before,
               afterState: after
             });
@@ -254,17 +256,17 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               highlightIndices: [j],
               sortedIndices: [...sortedIndices],
               operation: `Comparison Stop`,
-              description: `A[${j}] (${arr[j]}) ≤ Key (${key}). Correct insertion spot found at index ${j + 1}.`,
+              description: `A[${j}] (${formatElement(arr[j])}) ≤ Key (${formatElement(key)}). Correct insertion spot found at index ${j + 1}.`,
               decision: `Stop shifting; insert key at index ${j + 1}.`,
-              valuesExamined: `A[${j}]=${arr[j]}, Key=${key}`,
-              beforeState: `[${arr.join(', ')}]`,
-              afterState: `[${arr.join(', ')}]`
+              valuesExamined: `A[${j}]=${formatElement(arr[j])}, Key=${formatElement(key)}`,
+              beforeState: formatArray(arr),
+              afterState: formatArray(arr)
             });
             break;
           }
         }
 
-        const beforeInsert = `[${arr.join(', ')}]`;
+        const beforeInsert = formatArray(arr);
         arr[j + 1] = key;
         sortedIndices.push(i);
 
@@ -274,11 +276,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: [j + 1],
           sortedIndices: [...sortedIndices],
           operation: `Insert Key`,
-          description: `Inserted key (${key}) into position ${j + 1}. Prefix [0..${i}] is now sorted.`,
+          description: `Inserted key (${formatElement(key)}) into position ${j + 1}. Prefix [0..${i}] is now sorted.`,
           decision: `Key placement complete.`,
-          valuesExamined: `A[${j + 1}]=${key}`,
+          valuesExamined: `A[${j + 1}]=${formatElement(key)}`,
           beforeState: beforeInsert,
-          afterState: `[${arr.join(', ')}]`
+          afterState: formatArray(arr)
         });
       }
       break;
@@ -300,20 +302,21 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: Array.from({ length: right - left + 1 }, (_, idx) => left + idx),
           sortedIndices: [],
           operation: `Merge Subarrays [${left}..${mid}] and [${mid + 1}..${right}]`,
-          description: `Merging left sorted subarray [${leftArr.join(', ')}] and right sorted subarray [${rightArr.join(', ')}].`,
+          description: `Merging left sorted subarray ${formatArray(leftArr)} and right sorted subarray ${formatArray(rightArr)}.`,
           decision: `Combine two sorted halves into single sorted segment.`,
-          valuesExamined: `Left: [${leftArr.join(', ')}], Right: [${rightArr.join(', ')}]`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          valuesExamined: `Left: ${formatArray(leftArr)}, Right: ${formatArray(rightArr)}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         while (i < leftArr.length && j < rightArr.length) {
           comparisons++;
           const valL = leftArr[i];
           const valR = rightArr[j];
-          const before = `[${arr.join(', ')}]`;
+          const before = formatArray(arr);
+          const cmp = compareElements(valL, valR);
 
-          if (valL <= valR) {
+          if (cmp <= 0) {
             swaps++; // array write
             arr[k] = valL;
             steps.push({
@@ -322,11 +325,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               highlightIndices: [k],
               sortedIndices: [],
               operation: `Place Left Element`,
-              description: `Left value ${valL} ≤ Right value ${valR}. Placed ${valL} at index ${k}.`,
+              description: `Left value ${formatElement(valL)} ≤ Right value ${formatElement(valR)}. Placed ${formatElement(valL)} at index ${k}.`,
               decision: `Select left head element.`,
-              valuesExamined: `Left=${valL}, Right=${valR}`,
+              valuesExamined: `Left=${formatElement(valL)}, Right=${formatElement(valR)}`,
               beforeState: before,
-              afterState: `[${arr.join(', ')}]`
+              afterState: formatArray(arr)
             });
             i++;
           } else {
@@ -338,11 +341,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               highlightIndices: [k],
               sortedIndices: [],
               operation: `Place Right Element`,
-              description: `Right value ${valR} < Left value ${valL}. Placed ${valR} at index ${k}.`,
+              description: `Right value ${formatElement(valR)} < Left value ${formatElement(valL)}. Placed ${formatElement(valR)} at index ${k}.`,
               decision: `Select right head element.`,
-              valuesExamined: `Left=${valL}, Right=${valR}`,
+              valuesExamined: `Left=${formatElement(valL)}, Right=${formatElement(valR)}`,
               beforeState: before,
-              afterState: `[${arr.join(', ')}]`
+              afterState: formatArray(arr)
             });
             j++;
           }
@@ -358,11 +361,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             highlightIndices: [k],
             sortedIndices: [],
             operation: `Drain Remaining Left`,
-            description: `Placing remaining left element ${leftArr[i]} at index ${k}.`,
+            description: `Placing remaining left element ${formatElement(leftArr[i])} at index ${k}.`,
             decision: `Copy remaining left.`,
-            valuesExamined: `Left=${leftArr[i]}`,
-            beforeState: `[${arr.join(', ')}]`,
-            afterState: `[${arr.join(', ')}]`
+            valuesExamined: `Left=${formatElement(leftArr[i])}`,
+            beforeState: formatArray(arr),
+            afterState: formatArray(arr)
           });
           i++;
           k++;
@@ -377,11 +380,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             highlightIndices: [k],
             sortedIndices: [],
             operation: `Drain Remaining Right`,
-            description: `Placing remaining right element ${rightArr[j]} at index ${k}.`,
+            description: `Placing remaining right element ${formatElement(rightArr[j])} at index ${k}.`,
             decision: `Copy remaining right.`,
-            valuesExamined: `Right=${rightArr[j]}`,
-            beforeState: `[${arr.join(', ')}]`,
-            afterState: `[${arr.join(', ')}]`
+            valuesExamined: `Right=${formatElement(rightArr[j])}`,
+            beforeState: formatArray(arr),
+            afterState: formatArray(arr)
           });
           j++;
           k++;
@@ -398,11 +401,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           highlightIndices: [mid],
           sortedIndices: [],
           operation: `Divide Segment [${left}..${right}]`,
-          description: `Splitting segment at midpoint index ${mid} (value ${arr[mid]}). Left: [${left}..${mid}], Right: [${mid + 1}..${right}].`,
+          description: `Splitting segment at midpoint index ${mid} (value ${formatElement(arr[mid])}). Left: [${left}..${mid}], Right: [${mid + 1}..${right}].`,
           decision: `Recursive divide operation.`,
           valuesExamined: `Segment [${left}..${right}], Mid=${mid}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         sort(left, mid);
@@ -429,25 +432,25 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           pivotIndex: high,
           sortedIndices: [...sortedIndices],
           operation: `Select Pivot (Index ${high})`,
-          description: `Selected pivot = ${pivotVal} at index ${high}. Partitioning segment [${low}..${high - 1}].`,
-          decision: `Group elements < ${pivotVal} left, > ${pivotVal} right.`,
-          valuesExamined: `Pivot = ${pivotVal}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          description: `Selected pivot = ${formatElement(pivotVal)} at index ${high}. Partitioning segment [${low}..${high - 1}].`,
+          decision: `Group elements < ${formatElement(pivotVal)} left, > ${formatElement(pivotVal)} right.`,
+          valuesExamined: `Pivot = ${formatElement(pivotVal)}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         for (let j = low; j < high; j++) {
           comparisons++;
           const currentVal = arr[j];
-          const before = `[${arr.join(', ')}]`;
+          const before = formatArray(arr);
 
-          if (currentVal < pivotVal) {
+          if (compareElements(currentVal, pivotVal) < 0) {
             i++;
             swaps++;
             const temp = arr[i];
             arr[i] = arr[j];
             arr[j] = temp;
-            const after = `[${arr.join(', ')}]`;
+            const after = formatArray(arr);
 
             steps.push({
               stepIndex: stepCount++,
@@ -457,9 +460,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               pivotIndex: high,
               sortedIndices: [...sortedIndices],
               operation: `Partition Swap`,
-              description: `A[${j}] (${currentVal}) < Pivot (${pivotVal}). Swapped A[${i}] (${temp}) with A[${j}] (${currentVal}). Boundary index is now ${i}.`,
+              description: `A[${j}] (${formatElement(currentVal)}) < Pivot (${formatElement(pivotVal)}). Swapped A[${i}] (${formatElement(temp)}) with A[${j}] (${formatElement(currentVal)}). Boundary index is now ${i}.`,
               decision: `Element placed in left partition.`,
-              valuesExamined: `A[${j}]=${currentVal}, Pivot=${pivotVal}`,
+              valuesExamined: `A[${j}]=${formatElement(currentVal)}, Pivot=${formatElement(pivotVal)}`,
               beforeState: before,
               afterState: after
             });
@@ -471,9 +474,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
               pivotIndex: high,
               sortedIndices: [...sortedIndices],
               operation: `Partition Scan`,
-              description: `A[${j}] (${currentVal}) ≥ Pivot (${pivotVal}). Remains in right partition.`,
+              description: `A[${j}] (${formatElement(currentVal)}) ≥ Pivot (${formatElement(pivotVal)}). Remains in right partition.`,
               decision: `No swap; element belongs in right partition.`,
-              valuesExamined: `A[${j}]=${currentVal}, Pivot=${pivotVal}`,
+              valuesExamined: `A[${j}]=${formatElement(currentVal)}, Pivot=${formatElement(pivotVal)}`,
               beforeState: before,
               afterState: before
             });
@@ -496,11 +499,11 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           swapIndices: [pivotFinalIdx, high],
           sortedIndices: [...sortedIndices],
           operation: `Place Pivot at Index ${pivotFinalIdx}`,
-          description: `Placed pivot (${pivotVal}) into its final position at index ${pivotFinalIdx}. Left partition: [${low}..${pivotFinalIdx - 1}], Right partition: [${pivotFinalIdx + 1}..${high}].`,
+          description: `Placed pivot (${formatElement(pivotVal)}) into its final position at index ${pivotFinalIdx}. Left partition: [${low}..${pivotFinalIdx - 1}], Right partition: [${pivotFinalIdx + 1}..${high}].`,
           decision: `Pivot locked at final index ${pivotFinalIdx}.`,
-          valuesExamined: `Pivot = ${pivotVal}`,
-          beforeState: `[${arr.join(', ')}]`,
-          afterState: `[${arr.join(', ')}]`
+          valuesExamined: `Pivot = ${formatElement(pivotVal)}`,
+          beforeState: formatArray(arr),
+          afterState: formatArray(arr)
         });
 
         return pivotFinalIdx;
@@ -534,25 +537,25 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
 
         if (left < size) {
           comparisons++;
-          if (arr[left] > arr[largest]) {
+          if (compareElements(arr[left], arr[largest]) > 0) {
             largest = left;
           }
         }
 
         if (right < size) {
           comparisons++;
-          if (arr[right] > arr[largest]) {
+          if (compareElements(arr[right], arr[largest]) > 0) {
             largest = right;
           }
         }
 
         if (largest !== i) {
           swaps++;
-          const before = `[${arr.join(', ')}]`;
+          const before = formatArray(arr);
           const temp = arr[i];
           arr[i] = arr[largest];
           arr[largest] = temp;
-          const after = `[${arr.join(', ')}]`;
+          const after = formatArray(arr);
 
           steps.push({
             stepIndex: stepCount++,
@@ -562,9 +565,9 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
             heapSize: size,
             sortedIndices: [...sortedIndices],
             operation: `Heapify (Sift Down)`,
-            description: `Violated Max-Heap property at node ${i} (${temp}). Swapped with child at ${largest} (${arr[i]}).`,
+            description: `Violated Max-Heap property at node ${i} (${formatElement(temp)}). Swapped with child at ${largest} (${formatElement(arr[i])}).`,
             decision: `Restore max-heap subtree rooted at ${i}.`,
-            valuesExamined: `Parent A[${i}]=${temp}, Largest Child A[${largest}]=${arr[i]}`,
+            valuesExamined: `Parent A[${i}]=${formatElement(temp)}, Largest Child A[${largest}]=${formatElement(arr[i])}`,
             beforeState: before,
             afterState: after
           });
@@ -584,8 +587,8 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
         description: `Transforming array of size ${n} into a binary Max-Heap from the bottom up.`,
         decision: `Iterate non-leaf nodes from index ${Math.floor(n / 2) - 1} down to 0.`,
         valuesExamined: 'All internal tree nodes',
-        beforeState: `[${arr.join(', ')}]`,
-        afterState: `[${arr.join(', ')}]`
+        beforeState: formatArray(arr),
+        afterState: formatArray(arr)
       });
 
       for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
@@ -600,16 +603,16 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
         heapSize: n,
         sortedIndices: [],
         operation: `Max-Heap Constructed`,
-        description: `Max-heap construction complete. Maximum element is at root index 0 (${arr[0]}).`,
+        description: `Max-heap construction complete. Maximum element is at root index 0 (${formatElement(arr[0])}).`,
         decision: `Begin extraction phase.`,
-        valuesExamined: `Root = ${arr[0]}`,
-        beforeState: `[${arr.join(', ')}]`,
-        afterState: `[${arr.join(', ')}]`
+        valuesExamined: `Root = ${formatElement(arr[0])}`,
+        beforeState: formatArray(arr),
+        afterState: formatArray(arr)
       });
 
       for (let i = n - 1; i > 0; i--) {
         swaps++;
-        const before = `[${arr.join(', ')}]`;
+        const before = formatArray(arr);
         const maxVal = arr[0];
         const lastVal = arr[i];
         arr[0] = lastVal;
@@ -623,12 +626,12 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
           swapIndices: [0, i],
           heapSize: i,
           sortedIndices: [...sortedIndices],
-          operation: `Extract Max (${maxVal})`,
-          description: `Extracted max element ${maxVal} from root (0) to end index ${i}. Active heap size reduced to ${i}.`,
-          decision: `Lock position ${i}. Sift down new root (${lastVal}).`,
-          valuesExamined: `A[0]=${maxVal}, A[${i}]=${lastVal}`,
+          operation: `Extract Max (${formatElement(maxVal)})`,
+          description: `Extracted max element ${formatElement(maxVal)} from root (0) to end index ${i}. Active heap size reduced to ${i}.`,
+          decision: `Lock position ${i}. Sift down new root (${formatElement(lastVal)}).`,
+          valuesExamined: `A[0]=${formatElement(maxVal)}, A[${i}]=${formatElement(lastVal)}`,
           beforeState: before,
-          afterState: `[${arr.join(', ')}]`
+          afterState: formatArray(arr)
         });
 
         heapify(i, 0);
@@ -649,8 +652,8 @@ export function runSortingAlgorithm(algorithmId: AlgorithmId, input: number[]): 
     description: `Array successfully sorted in ascending order with ${comparisons} comparisons and ${swaps} swaps/movements.`,
     decision: 'All elements verified in non-decreasing order.',
     valuesExamined: 'Entire array',
-    beforeState: `[${arr.join(', ')}]`,
-    afterState: `[${arr.join(', ')}]`
+    beforeState: formatArray(arr),
+    afterState: formatArray(arr)
   });
 
   const endTime = performance.now();
